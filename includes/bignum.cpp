@@ -4,8 +4,8 @@
 #include <algorithm>
 
 namespace {
-  constexpr int toPower(int a, int n) {
-    int ret = 1;
+  constexpr long long toPower(long long a, int n) {
+    long long ret = 1;
     for (int i = 0; i < n; i++)
       ret *= a;
     return ret;
@@ -19,12 +19,12 @@ std::ostream& operator<< (std::ostream &o, Bignum<Digit> &x);
 template<int Digit>
 class Bignum {
   public:
-    static const int Base = toPower(10, Digit);
+    static const long long Base = toPower(10, Digit);
     bool negative;
-    std::vector<int> a;
-    Bignum(int val = 0);
-    Bignum<Digit>& operator *= (const int k);
-    Bignum<Digit>& operator /= (const int k);
+    std::vector<long long> a;
+    Bignum(long long val = 0);
+    Bignum<Digit>& operator *= (const long long k);
+    Bignum<Digit>& operator /= (const long long k);
     Bignum<Digit>& operator += (const Bignum<Digit> &x);
     Bignum<Digit>& operator -= (const Bignum<Digit> &x);
     friend std::ostream& operator<< <> (std::ostream &o, Bignum<Digit> &x);
@@ -33,7 +33,7 @@ class Bignum {
 };
 
 template<int Digit>
-Bignum<Digit>::Bignum(int val) {
+Bignum<Digit>::Bignum(long long val) {
   if (val < 0) {
     negative = true;
     val = -val;
@@ -63,15 +63,15 @@ void Bignum<Digit>::handle() {
 }
 
 template<int Digit>
-Bignum<Digit>& Bignum<Digit>::operator *= (const int k) {
+Bignum<Digit>& Bignum<Digit>::operator *= (const long long k) {
   for (auto &&v : a) v *= k;
   handle();
   return (*this);
 }
 
 template<int Digit>
-Bignum<Digit>& Bignum<Digit>::operator /= (const int k) {
-  int r = 0;
+Bignum<Digit>& Bignum<Digit>::operator /= (const long long k) {
+  long long r = 0;
   for (int i = (int)a.size() - 1; i >= 0; i--) {
     r = r * Base + a[i];
     a[i] = r / k;
@@ -107,6 +107,7 @@ Bignum<Digit>& Bignum<Digit>::operator -= (const Bignum<Digit> &x) {
   }
 
   a.resize(std::max(a.size(), x.a.size()), 0);
+
   int r = 0;
   for (auto i = 0; i < a.size(); i++) {
     a[i] = a[i] + r - (i < x.a.size() ? x.a[i] : 0);
@@ -120,6 +121,7 @@ Bignum<Digit>& Bignum<Digit>::operator -= (const Bignum<Digit> &x) {
   if (r == -1) {
     negative = !negative;
     a[0] = Base - a[0];
+
     for (auto i = 1; i < a.size(); i++)
       a[i] = Base - 1 - a[i];
   }
@@ -130,13 +132,13 @@ Bignum<Digit>& Bignum<Digit>::operator -= (const Bignum<Digit> &x) {
 template<int Digit>
 std::ostream& operator<< (std::ostream& out, Bignum<Digit> &x) {
   if (x.negative) out << "-";
+
   out << x.a.back();
   for (int i = (int)x.a.size() - 2; i >= 0; i--) {
     out << std::setfill('0') << std::setw(Digit) << x.a[i];
   }
   return out;
 }
-
 
 /*
 int main() {
